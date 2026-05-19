@@ -1,5 +1,7 @@
 #include "MatchEngine.h"
 #include <algorithm>
+#include <mutex>
+#include <shared_mutex>
 
 void MatchEngine::index_profile(const ProfileData& profile) {
     std::unique_lock lock(mutex_);
