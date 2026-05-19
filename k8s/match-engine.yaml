@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: match-engine
+  labels: { app: match-engine }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: match-engine }
+  template:
+    metadata:
+      labels: { app: match-engine }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+        - name: match-engine
+          image: match-engine:latest
+          ports:
+            - containerPort: 50051
+              name: grpc
+            - containerPort: 9090
+              name: metrics
+          env:
+            - name: GRPC_ADDRESS
+              value: "0.0.0.0:50051"
+          resources:
+            requests: { cpu: "250m", memory: "128Mi" }
+            limits:   { cpu: "1000m", memory: "512Mi" }
+          livenessProbe:
+            exec:
+              command: ["grpc_health_probe", "-addr=:50051"]
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command: ["grpc_health_probe", "-addr=:50051"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: match-engine
+  labels: { app: match-engine }
+spec:
+  selector: { app: match-engine }
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: grpc
+    - name: metrics
+      port: 9090
+      targetPort: metrics

@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+grpc:
+  client:
+    match-engine:
+      address: static://localhost:50051
+      negotiation-type: plaintext
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

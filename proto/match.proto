@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.matchengine.grpc";
+option java_outer_classname = "MatchProto";
+
+package match;
+
+service MatchService {
+  rpc FindMatches  (MatchRequest)   returns (MatchResponse);
+  rpc IndexProfile (ProfileRequest) returns (IndexResponse);
+  rpc GetStats     (StatsRequest)   returns (StatsResponse);
+}
+
+// ── Requests ───────────────────────────────────────────────────────────────
+
+message MatchRequest {
+  string          query_id         = 1;
+  repeated string required_skills  = 2;  // weight = 2.0
+  repeated string preferred_skills = 3;  // weight = 1.0
+  int32           max_results      = 4;  // default 10
+}
+
+message ProfileRequest {
+  string          profile_id = 1;
+  repeated string skills     = 2;
+}
+
+message StatsRequest {}
+
+// ── Responses ──────────────────────────────────────────────────────────────
+
+message MatchResult {
+  string          profile_id      = 1;
+  float           score           = 2;
+  repeated string matched_skills  = 3;
+}
+
+message MatchResponse {
+  repeated MatchResult results    = 1;
+  int64                latency_us = 2;
+}
+
+message IndexResponse {
+  bool  success    = 1;
+  int64 index_size = 2;  // total profiles indexed
+}
+
+message StatsResponse {
+  int64 profile_count   = 1;
+  int64 unique_skills   = 2;
+  int64 requests_total  = 3;
+}

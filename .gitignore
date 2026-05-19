@@ -1,0 +1,6 @@
+engine/build/
+gateway/target/
+*.class
+*.db
+.DS_Store
+__pycache__/
